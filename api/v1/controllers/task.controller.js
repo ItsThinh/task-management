@@ -1,5 +1,6 @@
 const Task = require("../models/task.model");
 const paginationHelper = require("../../../helpers/pagination");
+const searchHelper = require("../../../helpers/search");
 
 // [GET] api/v1/tasks
 module.exports.index = async (req, res) => {
@@ -31,6 +32,12 @@ module.exports.index = async (req, res) => {
     const paginationObject = paginationHelper(req.query);
     // End: Pagination
 
+    // Tìm kiếm theo title
+    if (req.query.keyword) {
+        const searchObject = searchHelper(req.query);
+        dbQuery.title = searchObject.regex;
+    }
+    // End: Tìm kiếm theo title
 
     const tasks = await Task.find(dbQuery)
         .select("title status timeStart timeEnd")
