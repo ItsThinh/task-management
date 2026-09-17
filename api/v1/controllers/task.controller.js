@@ -1,13 +1,14 @@
 const Task = require("../models/task.model");
+const paginationHelper = require("../../../helpers/pagination");
 
 // [GET] api/v1/tasks
 module.exports.index = async (req, res) => {
-    const { taskId: _id, taskTitle: title, taskStatus: status } = req.query;
 
     const dbQuery = {
         deleted: false
     };
 
+    // Tìm theo id, title hoặc status
     if (req.query._id) {
         dbQuery._id = req.query._id;
     }
@@ -17,17 +18,26 @@ module.exports.index = async (req, res) => {
     if (req.query.status) {
         dbQuery.status = req.query.status;
     }
+    // End: Tìm theo id, title hoặc status
 
+    // Sắp xếp hiển thị
     const sort = {};
     if (req.query.keyValue && req.query.sortValue) {
         sort[req.query.keyValue] = req.query.sortValue;
-        console.log(sort);
     }
+    // End: Sắp xếp hiển thị
+
+    // Pagination
+    const paginationObject = paginationHelper(req.query);
+    // End: Pagination
+
 
     const tasks = await Task.find(dbQuery)
         .select("title status timeStart timeEnd")
         .lean()
-        .sort(sort);
+        .sort(sort)
+        .skip(paginationObject.skip)
+        .limit(paginationObject.limit);
 
     res.json(tasks);
 }
