@@ -18,7 +18,16 @@ module.exports.index = async (req, res) => {
         dbQuery.status = req.query.status;
     }
 
-    const tasks = await Task.find(dbQuery).select("title status timeStart timeEnd").lean();
+    const sort = {};
+    if (req.query.keyValue && req.query.sortValue) {
+        sort[req.query.keyValue] = req.query.sortValue;
+        console.log(sort);
+    }
+
+    const tasks = await Task.find(dbQuery)
+        .select("title status timeStart timeEnd")
+        .lean()
+        .sort(sort);
 
     res.json(tasks);
 }
