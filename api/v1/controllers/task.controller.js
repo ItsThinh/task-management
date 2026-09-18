@@ -58,7 +58,7 @@ module.exports.detail = async (req, res) => {
         const tasks = await Task.findOne({
             _id: req.params.id,
             deleted: false
-        }).select("title status timeStart timeEnd").lean();
+        }).select("title status content timeStart timeFinish").lean();
 
         res.json(tasks);
     } catch (error) {
@@ -165,6 +165,26 @@ module.exports.create = async (req, res) => {
         res.json({
             code: 400,
             message: "Tạo không thành công"
+        });
+    }
+}
+
+// [POST] api/v1/tasks/edit/:id
+module.exports.edit = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await Task.updateOne(
+            { _id: id },
+            req.body
+        )
+        res.json({
+            code: 200,
+            message: "Cập nhật thành công"
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Cập nhật không thành công"
         });
     }
 }
