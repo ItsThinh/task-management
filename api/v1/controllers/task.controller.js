@@ -108,6 +108,10 @@ module.exports.changeStatus = async (req, res) => {
 module.exports.changeMulti = async (req, res) => {
     const { ids, key, value } = req.body;
 
+    const updateData = {
+        [key]: value
+    }
+
     if (!KEYS.includes(key)) {
         return res.status(400).json({
             code: 400,
@@ -130,10 +134,28 @@ module.exports.changeMulti = async (req, res) => {
         }
     }
 
+    if (key === "deleted") {
+        const deletedValue = JSON.parse(value);
+        if (typeof deletedValue !== "boolean") {
+            return res.status(400).json({
+                code: 400,
+                message: "Giá trị cập nhật mới không phù hợp"
+            });
+        }
+
+        updateData[key] = deletedValue;
+
+        if (deletedValue == true) {
+            updateData.deletedAt = new Date();
+        } else {
+            updateData.deletedAt = null;
+        }
+    }
+
     try {
         await Task.updateMany(
             { _id: { $in: ids } },
-            { $set: { [key]: value } }
+            { $set: updateData }
         );
 
         res.json({
@@ -185,6 +207,30 @@ module.exports.edit = async (req, res) => {
         res.json({
             code: 400,
             message: "Cập nhật không thành công"
+        });
+    }
+}
+
+// [DELETE] api/v1/tasks/delete/:id
+module.exports.delete = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await Task.updateOne(
+            { _id: id },
+            {
+                deleted: true,
+                deletedAt: new Date()
+            }
+        )
+        res.json({
+            code: 200,
+            message: "Xóa thành công"
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Xóa không thành công"
         });
     }
 }

@@ -9,5 +9,6 @@ router.patch("/change-status/:id", controller.changeStatus);
 router.patch("/change-multi", controller.changeMulti);
 router.post("/create", controller.create);
 router.post("/edit/:id", controller.edit);
+router.delete("/delete/:id", controller.delete);
 
 module.exports = router;
