@@ -63,3 +63,41 @@ module.exports.detail = async (req, res) => {
     }
 
 }
+
+// [PATCH] api/v1/tasks/change-status/:id
+module.exports.changeStatus = async (req, res) => {
+    const STATUSES = ["initial", "doing", "finish", "pending", "notFinish"];
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+        return res.status(400).json({
+            code: 400,
+            message: "Không nhận được giá trị cập nhật mới"
+        });
+    }
+
+    if (!STATUSES.includes(status)) {
+        return res.status(400).json({
+            code: 400,
+            message: "Giá trị cập nhật mới không phù hợp"
+        });
+    }
+    try {
+
+        await Task.updateOne(
+            { _id: id },
+            { status }
+        );
+
+        res.json({
+            code: 200,
+            message: "Cập nhật trạng thái thành công"
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Lỗi hệ thống hoặc id không hợp lệ"
+        });
+    }
+}

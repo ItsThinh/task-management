@@ -9,6 +9,7 @@ database.connect();
 const app = express();
 const PORT = process.env.PORT;
 
+app.use(express.json());
 route(app);
 
 app.listen(PORT, () => {
