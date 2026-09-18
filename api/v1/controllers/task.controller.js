@@ -2,6 +2,9 @@ const Task = require("../models/task.model");
 const paginationHelper = require("../../../helpers/pagination");
 const searchHelper = require("../../../helpers/search");
 
+const STATUSES = ["initial", "doing", "finish", "pending", "notFinish"];
+const KEYS = ["title", "status", "content", "timeStart", "timeFinish", "deleted"];
+
 // [GET] api/v1/tasks
 module.exports.index = async (req, res) => {
 
@@ -66,7 +69,6 @@ module.exports.detail = async (req, res) => {
 
 // [PATCH] api/v1/tasks/change-status/:id
 module.exports.changeStatus = async (req, res) => {
-    const STATUSES = ["initial", "doing", "finish", "pending", "notFinish"];
     const { id } = req.params;
     const { status } = req.body;
 
@@ -93,6 +95,50 @@ module.exports.changeStatus = async (req, res) => {
         res.json({
             code: 200,
             message: "Cập nhật trạng thái thành công"
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Lỗi hệ thống hoặc id không hợp lệ"
+        });
+    }
+}
+
+// [PATCH] api/v1/tasks/change-multi
+module.exports.changeMulti = async (req, res) => {
+    const { ids, key, value } = req.body;
+
+    if (!KEYS.includes(key)) {
+        return res.status(400).json({
+            code: 400,
+            message: "Trường cập nhật không hợp lệ"
+        });
+    }
+
+    if (key === "status") {
+        if (!value) {
+            return res.status(400).json({
+                code: 400,
+                message: "Không nhận được giá trị cập nhật mới"
+            });
+        }
+        if (!STATUSES.includes(value)) {
+            return res.status(400).json({
+                code: 400,
+                message: "Giá trị cập nhật mới không phù hợp"
+            });
+        }
+    }
+
+    try {
+        await Task.updateMany(
+            { _id: { $in: ids } },
+            { $set: { [key]: value } }
+        );
+
+        res.json({
+            code: 200,
+            message: "Cập nhật thông tin thành công"
         });
     } catch (error) {
         res.json({
