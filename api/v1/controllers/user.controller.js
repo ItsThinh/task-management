@@ -32,3 +32,30 @@ module.exports.register = async (req, res) => {
         token
     });
 };
+
+
+//[POST] api/v1/users/login
+module.exports.login = async (req, res) => {
+
+    const user = await User.findOne({
+        email: req.body.email,
+        password: md5(req.body.password),
+        deleted: false
+    });
+
+    if (!user) {
+        return res.json({
+            code: 400,
+            message: "Email không tồn tại hoặc sai mật khẩu"
+        });
+    }
+
+    const token = user.token;
+    res.cookie("token", token);
+
+    res.json({
+        code: 200,
+        message: "Đăng nhập thành công",
+        token
+    });
+};
