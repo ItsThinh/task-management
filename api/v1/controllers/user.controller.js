@@ -64,7 +64,7 @@ module.exports.login = async (req, res) => {
     });
 };
 
-//[POST] api/v1/users/forgot-password
+//[POST] api/v1/users/forgot
 module.exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     const otpCode = generateHelper.generateRandomInt(6);
@@ -92,5 +92,34 @@ module.exports.forgotPassword = async (req, res) => {
     res.json({
         code: 200,
         message: "Mã OTP đã được gửi",
+    })
+}
+
+//[POST] api/v1/users/otp
+module.exports.otpPassword = async (req, res) => {
+
+    const { email } = req.body;
+    const otp = parseInt(req.body.otp);
+
+    const otpPassword = await ForgotPassword.findOne({
+        email: email,
+        otp: otp
+    });
+
+    if (!otpPassword) {
+        return res.json({
+            code: 400,
+            message: "Mã OTP không chính xác"
+        });
+    }
+
+    const user = await User.findOne({ email }).select(" token ");
+
+    res.cookie("token", user.token);
+
+    res.json({
+        code: 200,
+        message: "Mã OTP đã được nhận",
+        token: user.token
     })
 }
