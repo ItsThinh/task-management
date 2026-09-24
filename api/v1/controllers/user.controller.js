@@ -155,3 +155,17 @@ module.exports.resetPassword = async (req, res) => {
         message: "Đã cập nhật mật khẩu"
     })
 }
+
+//[GET] api/v1/users/list
+module.exports.list = async (req, res) => {
+
+    const users = await User.find({
+        deleted: false
+    }).select("fullName email");
+
+    res.json({
+        code: 200,
+        message: "Đã lấy danh sách",
+        users: users
+    })
+}
