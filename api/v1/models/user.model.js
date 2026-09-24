@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
         phone: String,
         token: {
             type: String,
-            default: generate.generateRandomString(30)
+            default: () => generate.generateRandomString(30)
         },
         deleted: {
             type: Boolean,

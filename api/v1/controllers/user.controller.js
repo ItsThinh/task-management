@@ -37,7 +37,6 @@ module.exports.register = async (req, res) => {
     });
 };
 
-
 //[POST] api/v1/users/login
 module.exports.login = async (req, res) => {
 
@@ -66,14 +65,11 @@ module.exports.login = async (req, res) => {
 
 //[GET] api/v1/users/detail
 module.exports.detail = async (req, res) => {
-    const user = await User
-        .findOne({ token: req.cookies.token, deleted: false })
-        .select(" -password -token");
 
     res.json({
         code: 200,
         message: "Lấy thông tin thành công",
-        user
+        user: req.user
     });
 };
 
