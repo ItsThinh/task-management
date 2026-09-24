@@ -1,4 +1,5 @@
 const Task = require("../models/task.model");
+const User = require("../models/user.model");
 const paginationHelper = require("../../../helpers/pagination");
 const searchHelper = require("../../../helpers/search");
 
@@ -8,7 +9,13 @@ const KEYS = ["title", "status", "content", "timeStart", "timeFinish", "deleted"
 // [GET] api/v1/tasks
 module.exports.index = async (req, res) => {
 
+    const userId = req.user.id;
+
     const dbQuery = {
+        $or: [
+            { createdBy: userId },
+            { listUserId: userId },
+        ],
         deleted: false
     };
 
