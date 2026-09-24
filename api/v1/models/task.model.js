@@ -8,6 +8,7 @@ const taskSchema = new mongoose.Schema(
         phone: String,
         createdBy: String,
         listUserId: Array,
+        taskParentId: String,
         timeStart: Date,
         timeFinish: Date,
         deleted: {
